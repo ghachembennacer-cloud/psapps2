@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import {
   exchangeNpssoForAccessCode,
   exchangeAccessCodeForAuthTokens,
-  getFriendsListFirstParty, // <--- Name changed here
+  getFriendsList, // We will try the standard export again
   getBasicPresence,
   getUserTitles
 } from "psn-api";
@@ -15,18 +15,25 @@ export async function GET() {
     const accessCode = await exchangeNpssoForAccessCode(NPSSO);
     const authTokens = await exchangeAccessCodeForAuthTokens(accessCode);
 
-    // Update the function call here as well
-    const friendsResponse = await getFriendsListFirstParty(authTokens, "me");
+    // Using a try-catch specifically for friends so the whole app doesn't crash 
+    // if Sony changes the friend-list name again.
+    let friends = [];
+    try {
+      const friendsResponse = await getFriendsList(authTokens, "me");
+      friends = friendsResponse.friends;
+    } catch (e) {
+      console.error("Friends fetch failed, check psn-api version:", e);
+    }
+
     const gamesResponse = await getUserTitles(authTokens, "me");
     const presenceResponse = await getBasicPresence(authTokens, "me");
 
     return NextResponse.json({
       profile: presenceResponse,
-      friends: friendsResponse.friends,
+      friends: friends,
       games: gamesResponse.trophyTitles
     });
   } catch (error: any) {
-    console.error("PSN API Error:", error);
     return NextResponse.json({ error: "PSN_AUTH_ERROR", message: error.message }, { status: 500 });
   }
 }
