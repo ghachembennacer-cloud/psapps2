@@ -2,38 +2,39 @@ import { NextResponse } from "next/server";
 import {
   exchangeNpssoForAccessCode,
   exchangeAccessCodeForAuthTokens,
-  getFriendsList, // We will try the standard export again
+  getFriendsList, 
   getBasicPresence,
   getUserTitles
 } from "psn-api";
 
 export const dynamic = 'force-dynamic';
+
+// YOUR NPSSO TOKEN
 const NPSSO = "dKEEte64tE8lRFQFBm5MDWutKyFRsGezqpVJp3SuzGouaMDuEvjSb8xiSf4mjIG2";
 
 export async function GET() {
   try {
+    // 1. Authenticate with Sony
     const accessCode = await exchangeNpssoForAccessCode(NPSSO);
     const authTokens = await exchangeAccessCodeForAuthTokens(accessCode);
 
-    // Using a try-catch specifically for friends so the whole app doesn't crash 
-    // if Sony changes the friend-list name again.
-    let friends = [];
-    try {
-      const friendsResponse = await getFriendsList(authTokens, "me");
-      friends = friendsResponse.friends;
-    } catch (e) {
-      console.error("Friends fetch failed, check psn-api version:", e);
-    }
-
+    // 2. Fetch Data (Using the stable v2.3.2 names)
+    const friendsResponse = await getFriendsList(authTokens, "me");
     const gamesResponse = await getUserTitles(authTokens, "me");
     const presenceResponse = await getBasicPresence(authTokens, "me");
 
+    // 3. Return Data
     return NextResponse.json({
       profile: presenceResponse,
-      friends: friends,
-      games: gamesResponse.trophyTitles
+      friends: friendsResponse.friends || [],
+      games: gamesResponse.trophyTitles || []
     });
+
   } catch (error: any) {
-    return NextResponse.json({ error: "PSN_AUTH_ERROR", message: error.message }, { status: 500 });
+    console.error("PSN API Error:", error.message);
+    return NextResponse.json(
+      { error: "AUTH_FAILED", message: error.message }, 
+      { status: 500 }
+    );
   }
 }
