@@ -5,13 +5,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "next": "14.2.3",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "psn-api": "^2.1.0",
+    "psn-api": "2.3.2",
     "lucide-react": "latest",
     "framer-motion": "latest",
     "clsx": "latest",
