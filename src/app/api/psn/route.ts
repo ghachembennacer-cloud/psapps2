@@ -18,16 +18,23 @@ export async function GET() {
     const accessCode = await exchangeNpssoForAccessCode(NPSSO);
     const authTokens = await exchangeAccessCodeForAuthTokens(accessCode);
 
-    // 2. Fetch Data (Using the stable v2.3.2 names)
-    const friendsResponse = await getFriendsList(authTokens, "me");
-    const gamesResponse = await getUserTitles(authTokens, "me");
-    const presenceResponse = await getBasicPresence(authTokens, "me");
+    // 2. Fetch Data with Failsafes
+    // We fetch them separately so if one fails, the others still work
+    const [friendsRes, gamesRes, presenceRes] = await Promise.allSettled([
+      getFriendsList(authTokens, "me"),
+      getUserTitles(authTokens, "me"),
+      getBasicPresence(authTokens, "me")
+    ]);
 
-    // 3. Return Data
+    const friends = friendsRes.status === 'fulfilled' ? friendsRes.value.friends : [];
+    const games = gamesRes.status === 'fulfilled' ? gamesRes.value.trophyTitles : [];
+    const profile = presenceRes.status === 'fulfilled' ? presenceRes.value : null;
+
+    // 3. Return Clean Data
     return NextResponse.json({
-      profile: presenceResponse,
-      friends: friendsResponse.friends || [],
-      games: gamesResponse.trophyTitles || []
+      profile: profile,
+      friends: friends || [],
+      games: games || []
     });
 
   } catch (error: any) {
