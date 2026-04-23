@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import * as PSN from "psn-api"; // Namespace import is safer
+import * as PSN from "psn-api";
 
 export const dynamic = 'force-dynamic';
 const NPSSO = "dKEEte64tE8lRFQFBm5MDWutKyFRsGezqpVJp3SuzGouaMDuEvjSb8xiSf4mjIG2";
@@ -9,7 +9,6 @@ export async function GET() {
     const accessCode = await PSN.exchangeNpssoForAccessCode(NPSSO);
     const authTokens = await PSN.exchangeAccessCodeForAuthTokens(accessCode);
 
-    // In version 2.3.2, the function is definitely called getFriendsList
     const friendsResponse = await PSN.getFriendsList(authTokens, "me");
     const gamesResponse = await PSN.getUserTitles(authTokens, "me");
     const presenceResponse = await PSN.getBasicPresence(authTokens, "me");
