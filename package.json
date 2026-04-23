@@ -8,9 +8,9 @@
     "start": "next start"
   },
   "dependencies": {
-    "next": "14.2.10",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
+    "next": "16.2.4",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
     "psn-api": "2.3.2",
     "lucide-react": "latest",
     "framer-motion": "latest",
@@ -18,12 +18,12 @@
     "tailwind-merge": "latest"
   },
   "devDependencies": {
-    "typescript": "5.4.5",
-    "@types/node": "20.12.7",
-    "@types/react": "18.3.1",
-    "@types/react-dom": "18.3.1",
-    "autoprefixer": "10.4.19",
-    "postcss": "8.4.38",
-    "tailwindcss": "3.4.3"
+    "typescript": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "autoprefixer": "latest",
+    "postcss": "latest",
+    "tailwindcss": "latest"
   }
 }
