@@ -16,7 +16,7 @@ export async function GET() {
     const accessCode = await exchangeNpssoForAccessCode(NPSSO);
     const authTokens = await exchangeAccessCodeForAuthTokens(accessCode);
 
-    // Fetching data using the correct v2.3.2 export names
+    // Using strictly getFriendsList (The FirstParty version was removed in newer psn-api releases)
     const friendsResponse = await getFriendsList(authTokens, "me");
     const gamesResponse = await getUserTitles(authTokens, "me");
     const presenceResponse = await getBasicPresence(authTokens, "me");
@@ -28,6 +28,9 @@ export async function GET() {
     });
   } catch (error: any) {
     console.error("PSN API Error:", error.message);
-    return NextResponse.json({ error: "AUTH_FAILED", message: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: "AUTH_FAILED", message: error.message }, 
+      { status: 500 }
+    );
   }
 }
